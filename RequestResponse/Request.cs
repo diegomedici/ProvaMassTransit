@@ -1,6 +1,7 @@
 ﻿using System;
 using Magnum.Extensions;
 using MassTransit;
+using MassTransit.BusConfigurators;
 using Messages;
 
 namespace RequestResponse
@@ -18,17 +19,22 @@ namespace RequestResponse
             //            });                    
             //        sbc.ReceiveFrom("msmq://localhost/test_queue");
             //});
+            
+            
 
-            Bus.Instance.PublishRequest(new BasicRequest {Text = "Ciaobbello"}, x =>
+            var basicRequest = new BasicRequest {Text = "Ciaobbello"};
+            Console.WriteLine("Guid of req: {0}", basicRequest.CorrelationId);
+            Bus.Instance.PublishRequest(basicRequest, x =>
             {
-                x.Handle<BasicResponse>(message => Handle(message.Text));
+                x.Handle<BasicResponse>(message =>  Handle(message));
                 x.SetTimeout(30.Seconds());
             });
         }
 
-        public void Handle(string message)
+        public void Handle(BasicResponse message)
         {
-            Console.WriteLine(message);
+            Console.WriteLine("Guid of response: {0}", message.CorrelationId);
+            Console.WriteLine(message.Text);
         }
     }  
 }

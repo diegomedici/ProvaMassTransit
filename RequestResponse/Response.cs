@@ -1,4 +1,5 @@
-﻿using MassTransit;
+﻿using System;
+using MassTransit;
 using Messages;
 
 namespace RequestResponse
@@ -14,11 +15,13 @@ namespace RequestResponse
                     c.VerifyMsmqConfiguration();
                     c.UseMulticastSubscriptionClient();
                 });
-                sbc.ReceiveFrom("msmq://localhost/queue");
-                sbc.Subscribe(subs =>
-                {
-                    subs.Handler<BasicRequest>((cxt, msg) => cxt.Respond(new BasicResponse { Text = "RESP " + msg.Text }));
-                });
+                sbc.ReceiveFrom("msmq://localhost/resp_queue");
+                sbc.Subscribe(subs => subs.Handler<BasicRequest>((cxt, msg) =>
+                    {
+                        Console.WriteLine("Id of req: {0}", msg.CorrelationId);
+                        cxt.Respond(new BasicResponse {CorrelationId = msg.CorrelationId, Text = "RESP " + msg.Text});
+                        cxt.Respond(new BasicResponse() /*{CorrelationId = msg.CorrelationId, Text = "RESP " + msg.Text}*/);
+                    }));
             });
         }
     }
