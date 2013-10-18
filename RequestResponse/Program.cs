@@ -50,11 +50,12 @@ namespace RequestResponse
                     sbc.Subscribe(
                             sbs => sbs.Handler<Request>((ctx, msg) =>
                                 {
-                                    ctx.Respond(new Response {Text = "Hello, " + msg.Text});
+                                    ctx.Respond(new Response { Text = "Hello, " + msg.Text });
                                     //ctx.Respond(new Response {Text = "Hello again"});
                                 }));
                     sbc.Validate();
                 });
+            
 
             Console.WriteLine("Initialization is complete");
             requestorBus.PublishRequest(new Request { Text = "John" },
@@ -66,12 +67,14 @@ namespace RequestResponse
                                         });
 
             
-
+            
             Console.WriteLine("Press ENTER to continue");
-            Console.ReadLine();
-
+            Console.ReadLine();            
+            Console.WriteLine("Disposing...");
+            
             requestorBus.Dispose();
             replierBus.Dispose();
+            Console.WriteLine("Disposed...");
         }
 
         public class Request
